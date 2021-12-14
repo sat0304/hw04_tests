@@ -33,17 +33,24 @@ class PostPagesTests(TestCase):
     def test_pages_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон."""
         templates_page_names = {
-            'posts/index.html': reverse('posts:index'),
-            'posts/group_list.html': reverse('posts:group_list'),
-            'posts/profile.html': reverse('posts:profile'),
-            'posts/post_detail.html': reverse('posts:post_detail'),
-            'posts/create_post.html': reverse('posts:post_edit'),
-            'posts/create_post.html': reverse('posts:post_create'),
-            #'deals/task_detail.html': (
-            #    reverse('deals:task_detail', kwargs={'slug': 'test-slug'})),
+            'posts/index.html': 
+                reverse('posts:index'),
+            'posts/group_list.html': 
+                reverse('posts:group_list', kwargs={'slug': self.group.slug}
+            ),
+            'posts/profile.html':
+                reverse('posts:profile', kwargs={'username': self.post.author}
+            ),
+            'posts/post_detail.html': 
+                reverse('posts:post_detail', kwargs={'post_id': self.post.pk}
+            ),
+            'posts/create_post.html': 
+                reverse('posts:post_edit', kwargs={'post_id': self.post.pk}
+            ),
+            'posts/create_post.html': 
+                reverse('posts:post_create'),
+            
         }
-        # Проверяем, что при обращении к name
-        # вызывается соответствующий HTML-шаблон
         for template, reverse_name in templates_page_names.items():
             with self.subTest(template=template):
                 response = self.authorized_client.get(reverse_name)
@@ -51,23 +58,18 @@ class PostPagesTests(TestCase):
 
     def test_home_page_show_correct_context(self):
         """Шаблон home сформирован с правильным контекстом."""
-        response = self.guest_client.get(reverse('posts:index'))
-        # Словарь ожидаемых типов полей формы:
-        # указываем, объектами какого класса должны быть поля формы
+        response = self.authorized_client.get(
+            reverse('posts:post_create')
+        )
         form_fields = {
             'text': forms.fields.CharField,
-            'group': forms.fields.ChiceField,
+            'group': forms.fields.ChoiceField,
         }
-
-        # Проверяем, что типы полей формы в словаре context
-        # соответствуют ожиданиям
         for value, expected in form_fields.items():
             with self.subTest(value=value):
                 form_field = response.context['form'].fields[value]
-                # Проверяет, что поле формы является экземпляром
-                # указанного класса
                 self.assertIsInstance(form_field, expected)
-
+    
     def test_task_list_page_list_is_1(self):
         # Удостоверимся, что на страницу со списком заданий передаётся
         # ожидаемое количество объектов
