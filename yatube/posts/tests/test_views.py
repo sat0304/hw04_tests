@@ -23,12 +23,25 @@ class PostPagesTests(TestCase):
         cls.post = Post.objects.create(
             author=cls.auth,
             text='Тестовый_текст',
+            group=cls.group,
+        )
+        cls.group1 = Group.objects.create(
+            title='Тестовая_группа_1',
+            slug='test_slug_1',
+            description='Тестовое_описание_1',
+        )
+        cls.post1 = Post.objects.create(
+            author=cls.auth,
+            text='Тестовый_текст_1',
+            group=cls.group1,
         )
 
     def setUp(self):
-        self.guest_client = Client()
+        #self.guest_client = Client()
         self.authorized_client = Client()
+        self.authorized_author = Client()
         self.authorized_client.force_login(self.user)
+        self.authorized_author.force_login(self.auth)
 
     def test_pages_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон."""
@@ -56,8 +69,68 @@ class PostPagesTests(TestCase):
                 response = self.authorized_client.get(reverse_name)
                 self.assertTemplateUsed(response, template)
 
-    def test_home_page_show_correct_context(self):
-        """Шаблон home сформирован с правильным контекстом."""
+    def test_index_page_show_correct_context(self):
+        """Шаблон index сформирован с правильным контекстом."""
+        response = self.authorized_client.get(reverse('posts:index'))
+        test_slug = response.context['page_obj'][0]
+        index_text = test_slug.text
+        self.assertEqual(index_text,'Тестовый_текст_1')
+    
+    def test_group_list_page_show_correct_context(self):
+        """Шаблон group_list сформирован с правильным контекстом."""
+        response = self.authorized_client.get(
+            reverse('posts:group_list', kwargs={'slug': self.group1.slug}
+            )
+        )
+        test_post = response.context['page_obj'][0]
+        index_text = test_post.text
+        self.assertEqual(index_text, 'Тестовый_текст_1')
+
+    def test_profile_show_correct_context(self):
+        """Шаблон profile сформирован с правильным контекстом."""
+        response = self.authorized_client.get(
+            reverse('posts:profile', kwargs={'username': self.post.author}
+            )
+        )
+        test_post = response.context['page_obj'][0]
+        index_text = test_post.text
+        self.assertEqual(index_text, 'Тестовый_текст_1')
+
+    def test_post_detail_show_correct_context(self):
+        """Шаблон post_detail сформирован с правильным контекстом."""
+        response = self.authorized_client.get(
+            reverse('posts:post_detail', kwargs={'post_id': self.post.pk}
+            )
+        )
+        post_counted = Post.objects.filter(author=self.auth).count()
+        context_fields = {
+            'author':self.auth,
+            'post_count': post_counted,
+            'title_post': 'Пост ',
+        }
+        for value, expected in context_fields.items():
+            with self.subTest(value=value):
+                context_field = response.context[value]
+                self.assertEqual(context_field, expected)
+
+    def test_edit_post_show_correct_context(self):
+        """Шаблон post_edit сформирован с правильным контекстом."""
+        response = self.authorized_author.get(
+            reverse('posts:post_edit', kwargs={'post_id': self.post1.pk}
+            )
+        )
+        #print (self.post1.pk)
+        context_fields = {
+            'post_id': self.post1.pk,
+            'is_edit': True,
+        }
+        for value, expected in context_fields.items():
+            with self.subTest(value=value):
+                context_field = response.context[value]
+                self.assertEqual(context_field, expected)
+
+    def test_create_page_show_correct_context(self):
+        """Шаблон post_create сформирован с правильным контекстом."""
         response = self.authorized_client.get(
             reverse('posts:post_create')
         )
@@ -69,42 +142,10 @@ class PostPagesTests(TestCase):
             with self.subTest(value=value):
                 form_field = response.context['form'].fields[value]
                 self.assertIsInstance(form_field, expected)
-    
-    def test_task_list_page_list_is_1(self):
-        # Удостоверимся, что на страницу со списком заданий передаётся
-        # ожидаемое количество объектов
-        
-        response = self.authorized_client.get(reverse('deals:task_list'))
-        self.assertEqual(response.context['object_list'].count(), 1)
 
-    # Проверяем, что словарь context страницы /task
-    # в первом элементе списка object_list содержит ожидаемые значения
-    def test_task_list_page_show_correct_context(self):
-        """Шаблон task_list сформирован с правильным контекстом."""
-        response = self.authorized_client.get(reverse('deals:task_list'))
-        # Взяли первый элемент из списка и проверили, что его содержание
-        # совпадает с ожидаемым
-        first_object = response.context['object_list'][0]
-        task_title_0 = first_object.title
-        task_text_0 = first_object.text
-        task_slug_0 = first_object.slug
-        self.assertEqual(task_title_0, 'Заголовок')
-        self.assertEqual(task_text_0, 'Текст')
-        self.assertEqual(task_slug_0, 'test-slug')
-
-    # Проверяем, что словарь context страницы task/test-slug
-    # содержит ожидаемые значения
-    def test_task_detail_pages_show_correct_context(self):
-        """Шаблон task_detail сформирован с правильным контекстом."""
-        response = self.authorized_client.get(
-            reverse('deals:task_detail', kwargs={'slug': 'test-slug'})
-            )
-        self.assertEqual(response.context['task'].title, 'Заголовок')
-        self.assertEqual(response.context['task'].text, 'Текст')
-        self.assertEqual(response.context['task'].slug, 'test-slug')
-
-    def test_initial_value(self):
-        """Предустановленнное значение формы."""
-        response = self.guest_client.get(reverse('deals:home'))
-        title_inital = response.context['form'].fields['title'].initial
-        self.assertEqual(title_inital, 'Значение по-умолчанию')
+    def test_post_exist_on_home_page(self):
+        """Пост появился на главной странице."""
+        response = self.authorized_author.get(reverse('posts:index'))
+        test_slug = response.content[self.post1.text]
+        index_text = test_slug.text
+        self.assertEqual(index_text,'Тестовый_текст_1')
