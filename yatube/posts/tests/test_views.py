@@ -25,6 +25,7 @@ class PostPagesTests(TestCase):
             text='Тестовый_текст',
             group=cls.group,
         )
+        cls.post_count = Post.objects.count()
         cls.group1 = Group.objects.create(
             title='Тестовая_группа_1',
             slug='test_slug_1',
@@ -89,7 +90,7 @@ class PostPagesTests(TestCase):
     def test_profile_show_correct_context(self):
         """Шаблон profile сформирован с правильным контекстом."""
         response = self.authorized_client.get(
-            reverse('posts:profile', kwargs={'username': self.post.author}
+            reverse('posts:profile', kwargs={'username': self.post1.author}
             )
         )
         test_post = response.context['page_obj'][0]
@@ -145,7 +146,55 @@ class PostPagesTests(TestCase):
 
     def test_post_exist_on_home_page(self):
         """Пост появился на главной странице."""
-        response = self.authorized_author.get(reverse('posts:index'))
-        test_slug = response.content[self.post1.text]
-        index_text = test_slug.text
-        self.assertEqual(index_text,'Тестовый_текст_1')
+        form_fields = {
+            'text': forms.fields.CharField,
+            'group': forms.fields.ChoiceField,
+        }
+        response = self.authorized_author.post(
+            reverse('posts:index'),
+            data=form_fields,
+            follow=True
+        )
+        if (response.status_code == 200):
+            index_text = Post.objects.count()
+            self.assertEqual(index_text, self.post_count+1)
+            self.assertTrue(Post.objects.filter(
+                text='Тестовый_текст_1'
+                ).exists()
+            )
+            self.assertTrue(self.post1.group == self.group1)
+            self.assertTrue(self.post1.group != self.group)
+
+    def test_post_exist_on_group_page(self):
+        """Пост появился на странице группы."""
+        response = self.authorized_author.post(
+            reverse('posts:group_list',
+                kwargs={'slug': self.group1.slug}
+            )
+        )
+        if (response.status_code == 200):
+            index_text = Post.objects.count()
+            self.assertEqual(index_text, self.post_count+1)
+            self.assertTrue(Post.objects.filter(
+                text='Тестовый_текст_1'
+                ).exists()
+            )
+            self.assertTrue(self.post1.group == self.group1)
+            self.assertTrue(self.post1.group != self.group)
+
+    def test_post_exist_on_profile_page(self):
+        """Пост появился на странице профиля автора."""
+        response = self.authorized_author.post(
+            reverse('posts:profile',
+                kwargs={'username': self.post1.author}
+            )
+        )
+        if (response.status_code == 200):
+            index_text = Post.objects.count()
+            self.assertEqual(index_text, self.post_count+1)
+            self.assertTrue(Post.objects.filter(
+                text='Тестовый_текст_1'
+                ).exists()
+            )
+            self.assertTrue(self.post1.group == self.group1)
+            self.assertTrue(self.post1.group != self.group)    
