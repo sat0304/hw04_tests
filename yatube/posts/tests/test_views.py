@@ -50,24 +50,20 @@ class PostPagesTests(TestCase):
                 reverse('posts:index'),
             'posts/group_list.html':
                 reverse('posts:group_list',
-                    kwargs={'slug': self.group.slug
-                    }
-                ),
+                    kwargs={'slug': self.group.slug}
+                    ),
             'posts/profile.html':
                 reverse('posts:profile',
-                    kwargs={'username': self.post.author
-                    }
-                ),
+                    kwargs={'username': self.post.author}
+                    ),
             'posts/post_detail.html': 
                 reverse('posts:post_detail',
-                    kwargs={'post_id': self.post.pk
-                    }
-                ),
+                    kwargs={'post_id': self.post.pk}
+                    ),
             'posts/create_post.html':
                 reverse('posts:post_edit',
-                    kwargs={'post_id': self.post.pk
-                    }
-                ),
+                    kwargs={'post_id': self.post.pk}
+                    ),
             'posts/create_post.html':
                 reverse('posts:post_create'
                 ),  
@@ -98,10 +94,9 @@ class PostPagesTests(TestCase):
         """Шаблон profile сформирован с правильным контекстом."""
         response = self.authorized_client.get(
             reverse('posts:profile', 
-                kwargs={'username': self.post1.author
-                }
+                kwargs={'username': self.post1.author}
+                )
             )
-        )
         test_post = response.context['page_obj'][0]
         index_text = test_post.text
         self.assertEqual(index_text, 'Тестовый_текст_1')
@@ -110,14 +105,14 @@ class PostPagesTests(TestCase):
         """Шаблон post_detail сформирован с правильным контекстом."""
         response = self.authorized_client.get(
             reverse('posts:post_detail', kwargs={'post_id': self.post.pk}
+                )
             )
-        )
         post_counted = Post.objects.filter(author=self.auth).count()
         context_fields = {
             'author': self.auth,
             'post_count': post_counted,
             'title_post': 'Пост ',
-        }
+            }
         for value, expected in context_fields.items():
             with self.subTest(value=value):
                 context_field = response.context[value]
@@ -127,14 +122,13 @@ class PostPagesTests(TestCase):
         """Шаблон post_edit сформирован с правильным контекстом."""
         response = self.authorized_author.get(
             reverse('posts:post_edit', 
-                kwargs={'post_id': self.post1.pk
-                }
+                kwargs={'post_id': self.post1.pk}
+                )
             )
-        )
         context_fields = {
             'post_id': self.post1.pk,
             'is_edit': True,
-        }
+            }
         for value, expected in context_fields.items():
             with self.subTest(value=value):
                 context_field = response.context[value]
@@ -144,11 +138,11 @@ class PostPagesTests(TestCase):
         """Шаблон post_create сформирован с правильным контекстом."""
         response = self.authorized_client.get(
             reverse('posts:post_create')
-        )
+            )
         form_fields = {
             'text': forms.fields.CharField,
             'group': forms.fields.ChoiceField,
-        }
+            }
         for value, expected in form_fields.items():
             with self.subTest(value=value):
                 form_field = response.context['form'].fields[value]
@@ -159,19 +153,18 @@ class PostPagesTests(TestCase):
         form_fields = {
             'text': forms.fields.CharField,
             'group': forms.fields.ChoiceField,
-        }
+            }
         response = self.authorized_author.post(
             reverse('posts:index'),
             data=form_fields,
             follow=True
-        )
+            )
         if (response.status_code == 200):
             index_text = Post.objects.count()
             self.assertEqual(index_text, self.post_count + 1)
             self.assertTrue(Post.objects.filter(
-                text='Тестовый_текст_1'
-                ).exists()
-            )
+                text='Тестовый_текст_1').exists()
+                )
             self.assertTrue(self.post1.group == self.group1)
             self.assertTrue(self.post1.group != self.group)
 
@@ -179,17 +172,15 @@ class PostPagesTests(TestCase):
         """Пост появился на странице группы."""
         response = self.authorized_author.post(
             reverse('posts:group_list',
-                kwargs={'slug': self.group1.slug
-                }
+                kwargs={'slug': self.group1.slug}
+                )
             )
-        )
         if (response.status_code == 200):
             index_text = Post.objects.count()
             self.assertEqual(index_text, self.post_count + 1)
             self.assertTrue(Post.objects.filter(
-                text='Тестовый_текст_1'
-                ).exists()
-            )
+                text='Тестовый_текст_1').exists()
+                )
             self.assertTrue(self.post1.group == self.group1)
             self.assertTrue(self.post1.group != self.group)
 
@@ -197,17 +188,15 @@ class PostPagesTests(TestCase):
         """Пост появился на странице профиля автора."""
         response = self.authorized_author.post(
             reverse('posts:profile',
-                kwargs={'username': self.post1.author
-                }
+                kwargs={'username': self.post1.author}
+                )
             )
-        )
         if (response.status_code == 200):
             index_text = Post.objects.count()
             self.assertEqual(index_text, self.post_count + 1)
             self.assertTrue(Post.objects.filter( 
-                text='Тестовый_текст_1'
-                ).exists()
-            )
+                text='Тестовый_текст_1').exists()
+                )
             self.assertTrue(self.post1.group == self.group1)
             self.assertTrue(self.post1.group != self.group)
 
@@ -221,62 +210,56 @@ class PaginatorViewsTest(TestCase):
             title='Тестовая группа',
             slug='test_slug',
             description='Тестовое описание',
-        )
+            )
         for i in range(1, 14):
             cls.post = Post.objects.create(
             author=cls.auth,
             text=f'Тестовый_текст{i}',
             group=cls.group,
-        )
-        
+            )
+
     def setUp(self):
         self.authorized_author = Client()
         self.authorized_author.force_login(self.auth)
 
     def test_first_index_page_contains_ten_records(self):
         response = self.authorized_author.get(
-            reverse('posts:index'
+            reverse('posts:index')
             )
-        )
         self.assertEqual(len(response.context['page_obj']), 10)
 
     def test_second_index_page_contains_three_records(self):
         response = self.authorized_author.get(
-            reverse('posts:index') + '?page=2'
-            )
+            reverse('posts:index') + '?page=2')
         self.assertEqual(len(response.context['page_obj']), 3)
 
     def test_first_group_list_page_contains_ten_records(self):
         response = self.authorized_author.get(
             reverse('posts:group_list',
-                kwargs={'slug': self.group.slug
-                }
+                kwargs={'slug': self.group.slug}
+                )
             )
-        )
         self.assertEqual(len(response.context['page_obj']), 10)
 
     def test_second_group_list_page_contains_three_records(self):
         response = self.authorized_author.get(
             reverse('posts:group_list', kwargs={'slug': self.group.slug}
-            ) + '?page=2'
-        )
+                ) + '?page=2'
+            )
         self.assertEqual(len(response.context['page_obj']), 3)
 
     def test_first_profile_page_contains_ten_records(self):
         response = self.authorized_author.get(
             reverse('posts:profile',
-                kwargs={'username': self.post.author
-                }
+                kwargs={'username': self.post.author}
+                )
             )
-        )
         self.assertEqual(len(response.context['page_obj']), 10)
 
     def test_second_profile_page_contains_three_records(self):
         response = self.authorized_author.get(
             reverse('posts:profile',
-                kwargs={
-                    'username': self.post.author
-                    }
+                kwargs={'username': self.post.author}
                 ) + '?page=2'
-        )
+            )
         self.assertEqual(len(response.context['page_obj']), 3)
