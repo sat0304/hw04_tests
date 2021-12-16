@@ -14,10 +14,11 @@ class Group(models.Model):
     description = models.TextField('Записи сообщества')
 
     class Meta:
-        verbose_name_plural = 'Сообщества'   
+        verbose_name_plural = 'Сообщества'  
 
     def __str__(self) -> str:
         return self.title
+
 
 class Post(models.Model):
     """Таблица, содержащая сообщения (посты) пользователей."""
