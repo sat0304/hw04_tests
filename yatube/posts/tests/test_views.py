@@ -68,14 +68,23 @@ class PostPagesTests(TestCase):
                     'posts:post_edit',
                     kwargs={'post_id': self.post.pk}
                 ),
-            'posts/create_post.html':
-                reverse('posts:post_create'),  
         }
         for template, reverse_name in templates_page_names.items():
             with self.subTest(template=template):
                 response = self.authorized_client.get(reverse_name)
                 self.assertTemplateUsed(response, template)
 
+    def test_pages_uses_correct_template_create(self):
+        """URL-адрес использует соответствующий шаблон."""
+        templates_page_name = {
+            'posts/create_post.html':
+                reverse('posts:post_create')
+        }
+        for template, reverse_name in templates_page_name.items():
+            with self.subTest(template=template):
+                response = self.authorized_client.get(reverse_name)
+                self.assertTemplateUsed(response, template)
+    
     def test_index_page_show_correct_context(self):
         """Шаблон index сформирован с правильным контекстом."""
         response = self.authorized_client.get(reverse('posts:index'))
@@ -129,7 +138,7 @@ class PostPagesTests(TestCase):
         """Шаблон post_edit сформирован с правильным контекстом."""
         response = self.authorized_author.get(
             reverse(
-                'posts:post_edit', 
+                'posts:post_edit',
                 kwargs={'post_id': self.post1.pk}
             )
         )
@@ -204,7 +213,7 @@ class PostPagesTests(TestCase):
         if (response.status_code == 200):
             index_text = Post.objects.count()
             self.assertEqual(index_text, self.post_count + 1)
-            self.assertTrue(Post.objects.filter( 
+            self.assertTrue(Post.objects.filter(
                 text='Тестовый_текст_1').exists()
             )
             self.assertTrue(self.post1.group == self.group1)
@@ -223,10 +232,10 @@ class PaginatorViewsTest(TestCase):
         )
         for i in range(1, 14):
             cls.post = Post.objects.create(
-            author=cls.auth,
-            text=f'Тестовый_текст{i}',
-            group=cls.group,
-        )
+                author=cls.auth,
+                text=f'Тестовый_текст{i}',
+                group=cls.group,
+            )
 
     def setUp(self):
         self.authorized_author = Client()
