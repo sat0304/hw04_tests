@@ -50,23 +50,27 @@ class PostPagesTests(TestCase):
                 reverse('posts:index'),
             'posts/group_list.html':
                 reverse('posts:group_list',
-                kwargs={'slug': self.group.slug}
-                ),
+                kwargs={'slug': self.group.slug
+                }
+            ),
             'posts/profile.html':
                 reverse('posts:profile',
-                kwargs={'username': self.post.author}
-                ),
+                kwargs={'username': self.post.author
+                }
+            ),
             'posts/post_detail.html': 
                 reverse('posts:post_detail',
-                kwargs={'post_id': self.post.pk}
-                ),
+                kwargs={'post_id': self.post.pk
+                }
+            ),
             'posts/create_post.html':
                 reverse('posts:post_edit',
-                kwargs={'post_id': self.post.pk}
-                ),
+                kwargs={'post_id': self.post.pk
+                }
+            ),
             'posts/create_post.html':
                 reverse('posts:post_create'
-                ),  
+            ),  
         }
         for template, reverse_name in templates_page_names.items():
             with self.subTest(template=template):
