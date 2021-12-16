@@ -87,19 +87,10 @@ class PostURLTests(TestCase):
             'posts/group_list.html': f'/group/{self.group.slug}/',
             'posts/profile.html': f'/profile/{self.post.author}/',
             'posts/post_detail.html': f'/posts/{self.post.pk}/',
-            'posts/create_post.html': f'/posts/{self.post.pk}/edit/'
-        }
-        for template, adress in templates_url_names.items():
-            with self.subTest(adress=adress):
-                response = self.authorized_client.get(adress)
-                self.assertTemplateUsed(response, template)
-
-    def test_urls_uses_correct_template_create(self):
-        """URL-адрес использует соответствующий шаблон."""
-        templates_url_name = {
+            'posts/create_post.html': f'/posts/{self.post.pk}/edit/',
             'posts/create_post.html': '/create/',
         }
-        for template, adress in templates_url_name.items():
+        for template, adress in templates_url_names.items():
             with self.subTest(adress=adress):
                 response = self.authorized_client.get(adress)
                 self.assertTemplateUsed(response, template)

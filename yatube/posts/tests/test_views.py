@@ -68,19 +68,10 @@ class PostPagesTests(TestCase):
                     'posts:post_edit',
                     kwargs={'post_id': self.post.pk}
                 ),
+            'posts/create_post.html':
+                reverse('posts:post_create'),
         }
         for template, reverse_name in templates_page_names.items():
-            with self.subTest(template=template):
-                response = self.authorized_client.get(reverse_name)
-                self.assertTemplateUsed(response, template)
-
-    def test_pages_uses_correct_template_create(self):
-        """URL-адрес использует соответствующий шаблон."""
-        templates_page_name = {
-            'posts/create_post.html':
-                reverse('posts:post_create')
-        }
-        for template, reverse_name in templates_page_name.items():
             with self.subTest(template=template):
                 response = self.authorized_client.get(reverse_name)
                 self.assertTemplateUsed(response, template)
