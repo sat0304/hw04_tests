@@ -198,3 +198,61 @@ class PostPagesTests(TestCase):
             )
             self.assertTrue(self.post1.group == self.group1)
             self.assertTrue(self.post1.group != self.group)    
+
+
+class PaginatorViewsTest(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        #cls.user = User.objects.create_user(username='test_user')
+        cls.auth = User.objects.create_user(username='auth')
+        cls.group = Group.objects.create(
+            title='Тестовая группа',
+            slug='test_slug',
+            description='Тестовое описание',
+        )
+        for i in range(1, 14):
+            cls.post = Post.objects.create(
+            author=cls.auth,
+            text=f'Тестовый_текст{i}',
+            group=cls.group,
+        )
+    def setUp(self):
+        self.authorized_author = Client()
+        self.authorized_author.force_login(self.auth)
+
+    def test_first_index_page_contains_ten_records(self):
+        response = self.authorized_author.get(reverse('posts:index'))
+        self.assertEqual(len(response.context['page_obj']), 10)
+
+    def test_second_index_page_contains_three_records(self):
+        response = self.authorized_author.get(reverse('posts:index') + '?page=2')
+        self.assertEqual(len(response.context['page_obj']), 3)
+
+    def test_first_group_list_page_contains_ten_records(self):
+        response = self.authorized_author.get(
+            reverse('posts:group_list', kwargs={'slug': self.group.slug}
+            )
+        )
+        self.assertEqual(len(response.context['page_obj']), 10)
+
+    def test_second_group_list_page_contains_three_records(self):
+        response = self.authorized_author.get(
+            reverse('posts:group_list', kwargs={'slug': self.group.slug}
+            ) + '?page=2'
+        )
+        self.assertEqual(len(response.context['page_obj']), 3)
+
+    def test_first_profile_page_contains_ten_records(self):
+        response = self.authorized_author.get(
+            reverse('posts:profile', kwargs={'username': self.post.author}
+            )
+        )
+        self.assertEqual(len(response.context['page_obj']), 10)
+
+    def test_second_profile_page_contains_three_records(self):
+        response = self.authorized_author.get(
+            reverse('posts:profile', kwargs={'username': self.post.author}
+            ) + '?page=2'
+        )
+        self.assertEqual(len(response.context['page_obj']), 3)
