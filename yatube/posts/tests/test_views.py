@@ -49,13 +49,15 @@ class PostPagesTests(TestCase):
             'posts/index.html':
                 reverse('posts:index'),
             'posts/group_list.html':
-                reverse('posts:group_list',
+                reverse(
+                    'posts:group_list',
                     kwargs={'slug': self.group.slug}
-                    ),
+                ),
             'posts/profile.html':
-                reverse('posts:profile',
+                reverse(
+                    'posts:profile',
                     kwargs={'username': self.post.author}
-                    ),
+                ),
             'posts/post_detail.html': 
                 reverse('posts:post_detail',
                     kwargs={'post_id': self.post.pk}
