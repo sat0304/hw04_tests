@@ -31,7 +31,9 @@ class PostModelTest(TestCase):
         }
         for field, expected_value in field_object_names.items():
             with self.subTest(field=field):
-                self.assertEqual(str(field), expected_value
+                self.assertEqual(
+                    str(field),
+                    expected_value
                 )
 
     def test_model_have_correct_verbose_name(self):

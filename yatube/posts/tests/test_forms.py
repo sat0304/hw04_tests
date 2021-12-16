@@ -29,7 +29,7 @@ class PostCreateFormTests(TestCase):
         self.authorized_author.force_login(self.auth)
 
     def test_post_creation_forms(self):
-        """Проверяем, что при отправке валидной формы создается 
+        """Проверяем, что при отправке валидной формы создается
         новая запись в БД и происходт редирект."""
         post_count = Post.objects.count()
         form_data = {
@@ -41,11 +41,12 @@ class PostCreateFormTests(TestCase):
             data=form_data,
             follow=True,
         )
-        self.assertRedirects(response, reverse(
-            'posts:profile', args=['auth']
+        self.assertRedirects(
+            response, reverse(
+                'posts:profile', args=['auth']
             )
         )
-        self.assertEqual(Post.objects.count(), post_count+1)
+        self.assertEqual(Post.objects.count(), post_count + 1)
         self.assertTrue(
             Post.objects.filter(text='Тестовый текст_1').exists()
         )
@@ -54,7 +55,9 @@ class PostCreateFormTests(TestCase):
         """Проверяем, что при редактировании меняется текст."""
         last_post = Post.objects.latest('id')
         response = self.authorized_author.get(
-            reverse('posts:post_detail', kwargs={'post_id': self.post.pk}
+            reverse('posts:post_detail',
+                kwargs={'post_id': self.post.pk
+                }
             )
         )
         if (response.status_code == 200):
@@ -65,11 +68,11 @@ class PostCreateFormTests(TestCase):
             }
             response = self.authorized_author.post(
             reverse('posts:post_create'),
-            data=form_data,
-            follow=True,
+            data = form_data,
+            follow = True,
             )
-            #print(self.post.text)
-            #print(last_post.text)
+            # print(self.post.text)
+            # print(last_post.text)
             self.assertEqual(last_post.text, self.post.text)
 
     def test_post_edit(self):
@@ -84,9 +87,9 @@ class PostCreateFormTests(TestCase):
             'group': self.group.id,
         }
         response = PostCreateFormTests.authorized_author.get(
-            reverse('posts:post_edit', args=[self.post.id]),
-            data=form_data,
-            follow=True
+            reverse('posts:post_edit', args=[self.post.pk]),
+            data = form_data,
+            follow = True
         )
         if (response.status_code == 200):
             self.assertEqual(self.post.text, 'Тестовый текст_3')
