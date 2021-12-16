@@ -64,7 +64,8 @@ class PostPagesTests(TestCase):
                     kwargs={'post_id': self.post.pk}
                 ),
             'posts/create_post.html':
-                reverse('posts:post_edit',
+                reverse(
+                    'posts:post_edit',
                     kwargs={'post_id': self.post.pk}
                 ),
             'posts/create_post.html':
@@ -85,7 +86,9 @@ class PostPagesTests(TestCase):
     def test_group_list_page_show_correct_context(self):
         """Шаблон group_list сформирован с правильным контекстом."""
         response = self.authorized_client.get(
-            reverse('posts:group_list', kwargs={'slug': self.group1.slug}
+            reverse(
+                'posts:group_list',
+                kwargs={'slug': self.group1.slug}
             )
         )
         test_post = response.context['page_obj'][0]
@@ -95,7 +98,8 @@ class PostPagesTests(TestCase):
     def test_profile_show_correct_context(self):
         """Шаблон profile сформирован с правильным контекстом."""
         response = self.authorized_client.get(
-            reverse('posts:profile', 
+            reverse(
+                'posts:profile',
                 kwargs={'username': self.post1.author}
             )
         )
@@ -106,7 +110,8 @@ class PostPagesTests(TestCase):
     def test_post_detail_show_correct_context(self):
         """Шаблон post_detail сформирован с правильным контекстом."""
         response = self.authorized_client.get(
-            reverse('posts:post_detail', kwargs={'post_id': self.post.pk}
+            reverse(
+                'posts:post_detail', kwargs={'post_id': self.post.pk}
             )
         )
         post_counted = Post.objects.filter(author=self.auth).count()
@@ -174,7 +179,8 @@ class PostPagesTests(TestCase):
     def test_post_exist_on_group_page(self):
         """Пост появился на странице группы."""
         response = self.authorized_author.post(
-            reverse('posts:group_list',
+            reverse(
+                'posts:group_list',
                 kwargs={'slug': self.group1.slug}
             )
         )
@@ -239,7 +245,8 @@ class PaginatorViewsTest(TestCase):
 
     def test_first_group_list_page_contains_ten_records(self):
         response = self.authorized_author.get(
-            reverse('posts:group_list',
+            reverse(
+                'posts:group_list',
                 kwargs={'slug': self.group.slug}
             )
         )
@@ -247,14 +254,16 @@ class PaginatorViewsTest(TestCase):
 
     def test_second_group_list_page_contains_three_records(self):
         response = self.authorized_author.get(
-            reverse('posts:group_list', kwargs={'slug': self.group.slug}
+            reverse(
+                'posts:group_list', kwargs={'slug': self.group.slug}
             ) + '?page=2'
         )
         self.assertEqual(len(response.context['page_obj']), 3)
 
     def test_first_profile_page_contains_ten_records(self):
         response = self.authorized_author.get(
-            reverse('posts:profile',
+            reverse(
+                'posts:profile',
                 kwargs={'username': self.post.author}
             )
         )
@@ -262,7 +271,8 @@ class PaginatorViewsTest(TestCase):
 
     def test_second_profile_page_contains_three_records(self):
         response = self.authorized_author.get(
-            reverse('posts:profile',
+            reverse(
+                'posts:profile',
                 kwargs={'username': self.post.author}
             ) + '?page=2'
         )

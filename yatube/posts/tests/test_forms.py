@@ -38,8 +38,8 @@ class PostCreateFormTests(TestCase):
         }
         response = self.authorized_author.post(
             reverse('posts:post_create'),
-            data = form_data,
-            follow = True,
+            data=form_data,
+            follow=True,
         )
         self.assertRedirects(
             response, reverse(
@@ -55,7 +55,8 @@ class PostCreateFormTests(TestCase):
         """Проверяем, что при редактировании меняется текст."""
         last_post = Post.objects.latest('id')
         response = self.authorized_author.get(
-            reverse('posts:post_detail',
+            reverse(
+                'posts:post_detail',
                 kwargs={'post_id': self.post.pk}
             )
         )
@@ -67,8 +68,8 @@ class PostCreateFormTests(TestCase):
             }
             response = self.authorized_author.post(
                 reverse('posts:post_create'),
-                data = form_data,
-                follow = True,
+                data=form_data,
+                follow=True,
             )
             # print(self.post.text)
             # print(last_post.text)
@@ -76,9 +77,9 @@ class PostCreateFormTests(TestCase):
 
     def test_post_edit(self):
         self.post = Post.objects.create(
-            author = self.auth,
-            text = 'Тестовый текст_3',
-            group = self.group,
+            author=self.auth,
+            text='Тестовый текст_3',
+            group=self.group,
         )
         posts_count = Post.objects.count()
         form_data = {
@@ -87,8 +88,8 @@ class PostCreateFormTests(TestCase):
         }
         response = PostCreateFormTests.authorized_author.get(
             reverse('posts:post_edit', args=[self.post.pk]),
-            data = form_data,
-            follow = True
+            data=form_data,
+            follow=True
         )
         if (response.status_code == 200):
             self.assertEqual(self.post.text, 'Тестовый текст_3')
