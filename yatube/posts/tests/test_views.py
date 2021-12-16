@@ -38,7 +38,6 @@ class PostPagesTests(TestCase):
         )
 
     def setUp(self):
-        #self.guest_client = Client()
         self.authorized_client = Client()
         self.authorized_author = Client()
         self.authorized_client.force_login(self.user)
@@ -47,22 +46,22 @@ class PostPagesTests(TestCase):
     def test_pages_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон."""
         templates_page_names = {
-            'posts/index.html': 
+            'posts/index.html':
                 reverse('posts:index'),
-            'posts/group_list.html': 
+            'posts/group_list.html':
                 reverse('posts:group_list', kwargs={'slug': self.group.slug}
-            ),
+                ),
             'posts/profile.html':
                 reverse('posts:profile', kwargs={'username': self.post.author}
-            ),
+                ),
             'posts/post_detail.html': 
                 reverse('posts:post_detail', kwargs={'post_id': self.post.pk}
-            ),
-            'posts/create_post.html': 
+                ),
+            'posts/create_post.html':
                 reverse('posts:post_edit', kwargs={'post_id': self.post.pk}
-            ),
-            'posts/create_post.html': 
-                reverse('posts:post_create'),
+                ),
+            # 'posts/create_post.html':
+            #   reverse('posts:post_create'),
             
         }
         for template, reverse_name in templates_page_names.items():
@@ -76,7 +75,7 @@ class PostPagesTests(TestCase):
         test_slug = response.context['page_obj'][0]
         index_text = test_slug.text
         self.assertEqual(index_text,'Тестовый_текст_1')
-    
+
     def test_group_list_page_show_correct_context(self):
         """Шаблон group_list сформирован с правильным контекстом."""
         response = self.authorized_client.get(
@@ -197,7 +196,7 @@ class PostPagesTests(TestCase):
                 ).exists()
             )
             self.assertTrue(self.post1.group == self.group1)
-            self.assertTrue(self.post1.group != self.group)    
+            self.assertTrue(self.post1.group != self.group)
 
 
 class PaginatorViewsTest(TestCase):

@@ -69,6 +69,6 @@ class PostCreateFormTests(TestCase):
             data=form_data,
             follow=True,
             )
-            print(self.post.text)
-            print(last_post.text)
+            #print(self.post.text)
+            #print(last_post.text)
             self.assertEqual(last_post.text, self.post.text)
