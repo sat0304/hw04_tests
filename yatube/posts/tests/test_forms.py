@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
-from django import forms
 
 from posts.models import Group, Post
 
@@ -25,10 +24,10 @@ class PostCreateFormTests(TestCase):
             text='Тестовый текст',
             group=cls.group,
         )
-        
+
     def setUp(self):
         self.authorized_author.force_login(self.auth)
-        
+
     def test_post_creation_forms(self):
         """Проверяем, что при отправке валидной формы создается 
         новая запись в БД и происходт редирект."""
@@ -72,3 +71,23 @@ class PostCreateFormTests(TestCase):
             #print(self.post.text)
             #print(last_post.text)
             self.assertEqual(last_post.text, self.post.text)
+
+    def test_post_edit(self):
+        self.post = Post.objects.create(
+            author = self.auth,
+            text = 'Тестовый текст_3',
+            group = self.group,
+        )
+        posts_count = Post.objects.count()
+        form_data = {
+            'text': 'Тестовый текст_3',
+            'group': self.group.id,
+        }
+        response = PostCreateFormTests.authorized_author.get(
+            reverse('posts:post_edit', args=[self.post.id]),
+            data=form_data,
+            follow=True
+        )
+        if (response.status_code == 200):
+            self.assertEqual(self.post.text, 'Тестовый текст_3')
+            self.assertEqual(Post.objects.count(), posts_count)
