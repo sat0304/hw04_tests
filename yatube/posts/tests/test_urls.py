@@ -87,7 +87,7 @@ class PostURLTests(TestCase):
             'posts/group_list.html': f'/group/{self.group.slug}/',
             'posts/profile.html': f'/profile/{self.post.author}/',
             'posts/post_detail.html': f'/posts/{self.post.pk}/',
-            'posts/create_post.html'or 'posts/update_post.html':
+            'posts/create_post.html' or 'posts/update_post.html':
                 f'/posts/{self.post.pk}/edit/',
             'posts/create_post.html': '/create/',
         }
