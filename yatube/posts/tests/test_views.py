@@ -63,7 +63,7 @@ class PostPagesTests(TestCase):
                     'posts:post_detail',
                     kwargs={'post_id': self.post.pk}
                 ),
-            'posts/create_post.html':
+            'posts/create_post.html' or 'posts/update_post.html':
                 reverse(
                     'posts:post_edit',
                     kwargs={'post_id': self.post.pk}
