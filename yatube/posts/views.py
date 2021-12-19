@@ -128,6 +128,7 @@ def post_edit(request, post_id):
                     }
                 )
         form = PostForm(instance=post)
+        files=request.FILES or None,
         return render(
             request,
             template5,

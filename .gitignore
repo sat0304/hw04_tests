@@ -172,3 +172,10 @@ htmlcov/
 .coverage.*
 coverage.xml
 *.cover 
+
+#media
+media/
+.media
+./media
+./media/
+./MEDIA/
