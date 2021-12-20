@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container py-5">
   <h1>{{ title_author }}{{ auser }}</h1>
-  <h3>{{ counted_posts}}{{ post_count }}</h3>
+  <h3>{{ counted_posts}}{{ auser.posts.count }}</h3>
       <ul>
         <li>
           Автор: {{ auser }}

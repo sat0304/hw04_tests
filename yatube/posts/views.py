@@ -45,7 +45,7 @@ def profile(request, username):
     template3 = 'posts/profile.html'
     try:
         auser = User.objects.get(username=username)
-        post_count = Post.objects.filter(author=auser).count()
+        # post_count = Post.objects.filter(author=auser).count()
         post_list = Post.objects.filter(author=auser).all()
         paginator = Paginator(post_list, settings.NUM_OF_POSTS_ON_PAGE)
         page_number = request.GET.get('page')
@@ -53,7 +53,7 @@ def profile(request, username):
         context = {
             'auser': auser,
             'page_obj': page_obj,
-            'post_count': post_count,
+            # 'post_count': post_count,
             'title_author': 'Все посты пользователя ',
             'counted_posts': 'Всего постов: '
         }
