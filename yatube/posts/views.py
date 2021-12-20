@@ -108,7 +108,6 @@ def post_edit(request, post_id):
     template5 = 'posts/create_post.html'
     template6 = 'posts:post_detail'
     post = get_object_or_404(Post, pk=post_id)
-    files=request.FILES or None
     if post.author == request.user:
         is_edit = True
         if request.method == 'POST':
