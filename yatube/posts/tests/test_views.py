@@ -1,11 +1,11 @@
+from http import HTTPStatus
+
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 from django import forms
 
-from posts.models import Group, Post
-
-User = get_user_model()
+from posts.models import Group, Post, User
 
 
 class PostPagesTests(TestCase):
@@ -167,7 +167,7 @@ class PostPagesTests(TestCase):
             data=form_fields,
             follow=True
         )
-        if (response.status_code == 200):
+        if (response.status_code == HTTPStatus.OK):
             index_text = Post.objects.count()
             self.assertEqual(index_text, self.post_count + 1)
             self.assertTrue(Post.objects.filter(
@@ -184,7 +184,7 @@ class PostPagesTests(TestCase):
                 kwargs={'slug': self.group1.slug}
             )
         )
-        if (response.status_code == 200):
+        if (response.status_code == HTTPStatus.OK):
             index_text = Post.objects.count()
             self.assertEqual(index_text, self.post_count + 1)
             self.assertTrue(Post.objects.filter(
@@ -201,7 +201,7 @@ class PostPagesTests(TestCase):
                 kwargs={'username': self.post1.author}
             )
         )
-        if (response.status_code == 200):
+        if (response.status_code == HTTPStatus.OK):
             index_text = Post.objects.count()
             self.assertEqual(index_text, self.post_count + 1)
             self.assertTrue(Post.objects.filter(

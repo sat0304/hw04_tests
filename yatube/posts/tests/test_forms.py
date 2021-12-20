@@ -1,10 +1,10 @@
+from http import HTTPStatus
+
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from posts.models import Group, Post
-
-User = get_user_model()
+from posts.models import Group, Post, User
 
 
 class PostCreateFormTests(TestCase):
@@ -60,7 +60,7 @@ class PostCreateFormTests(TestCase):
                 kwargs={'post_id': self.post.pk}
             )
         )
-        if (response.status_code == 200):
+        if (response.status_code == HTTPStatus.OK):
             form_data = {
                 'text': 'Тестовый текст_2',
                 'group': self.group.id,
@@ -91,6 +91,6 @@ class PostCreateFormTests(TestCase):
             data=form_data,
             follow=True
         )
-        if (response.status_code == 200):
+        if (response.status_code == HTTPStatus.OK):
             self.assertEqual(self.post.text, 'Тестовый текст_3')
             self.assertEqual(Post.objects.count(), posts_count)

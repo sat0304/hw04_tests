@@ -1,9 +1,9 @@
-from django.contrib.auth import get_user_model
+from http import HTTPStatus
+
 from django.test import Client, TestCase
+from django.conf import settings
 
-from posts.models import Group, Post
-
-User = get_user_model()
+from posts.models import Group, Post, User
 
 
 class PostURLTests(TestCase):
@@ -35,13 +35,13 @@ class PostURLTests(TestCase):
     def test_url_exists_at_desired_location_auth(self):
         """URL-адрес существует для автора поста."""
         templates_url_names = {
-            '/': 200,
-            f'/group/{self.group.slug}/': 200,
-            f'/profile/{self.post.author}/': 200,
-            f'/posts/{self.post.pk}/': 200,
-            f'/posts/{self.post.pk}/edit/': 200,
-            '/create/': 200,
-            'unexist.html': 404,
+            settings.HOME_PAGE: HTTPStatus.OK,
+            f'/group/{self.group.slug}/': HTTPStatus.OK,
+            f'/profile/{self.post.author}/': HTTPStatus.OK,
+            f'{settings.POSTS}{self.post.pk}/': HTTPStatus.OK,
+            f'{settings.POSTS}{self.post.pk}/edit/': HTTPStatus.OK,
+            '/create/': HTTPStatus.OK,
+            'unexist.html': HTTPStatus.NOT_FOUND,
         }
         for template, status in templates_url_names.items():
             with self.subTest(status=status):
@@ -51,13 +51,13 @@ class PostURLTests(TestCase):
     def test_url_exists_at_desired_location_user(self):
         """URL-адрес существует для зарегистрированного."""
         templates_url_names = {
-            '/': 200,
-            f'/group/{self.group.slug}/': 200,
-            f'/profile/{self.post.author}/': 200,
-            f'/posts/{self.post.pk}/': 200,
-            f'/posts/{self.post.pk}/edit/': 302,
-            '/create/': 200,
-            'unexist.html': 404,
+            settings.HOME_PAGE: HTTPStatus.OK,
+            f'/group/{self.group.slug}/': HTTPStatus.OK,
+            f'/profile/{self.post.author}/': HTTPStatus.OK,
+            f'{settings.POSTS}{self.post.pk}/': HTTPStatus.OK,
+            f'{settings.POSTS}{self.post.pk}/edit/': HTTPStatus.FOUND,
+            '/create/': HTTPStatus.OK,
+            'unexist.html': HTTPStatus.NOT_FOUND,
         }
         for template, status in templates_url_names.items():
             with self.subTest(status=status):
@@ -67,13 +67,13 @@ class PostURLTests(TestCase):
     def test_url_exists_at_desired_location_not_auth(self):
         """URL-адрес существует для незарегистрированного."""
         templates_url_names = {
-            '/': 200,
-            f'/group/{self.group.slug}/': 200,
-            f'/profile/{self.post.author}/': 200,
-            f'/posts/{self.post.pk}/': 200,
-            f'/posts/{self.post.pk}/edit/': 302,
-            '/create/': 302,
-            'unexist.html': 404,
+            settings.HOME_PAGE: HTTPStatus.OK,
+            f'/group/{self.group.slug}/': HTTPStatus.OK,
+            f'/profile/{self.post.author}/': HTTPStatus.OK,
+            f'{settings.POSTS}{self.post.pk}/': HTTPStatus.OK,
+            f'{settings.POSTS}{self.post.pk}/edit/': HTTPStatus.FOUND,
+            '/create/': HTTPStatus.FOUND,
+            'unexist.html': HTTPStatus.NOT_FOUND,
         }
         for template, status in templates_url_names.items():
             with self.subTest(status=status):
@@ -83,10 +83,10 @@ class PostURLTests(TestCase):
     def test_urls_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон."""
         templates_url_names = {
-            'posts/index.html': '/',
+            'posts/index.html': settings.HOME_PAGE,
             'posts/group_list.html': f'/group/{self.group.slug}/',
             'posts/profile.html': f'/profile/{self.post.author}/',
-            'posts/post_detail.html': f'/posts/{self.post.pk}/',
+            'posts/post_detail.html': f'{settings.POSTS}{self.post.pk}/',
             'posts/create_post.html' or 'posts/update_post.html':
                 f'/posts/{self.post.pk}/edit/',
             'posts/create_post.html': '/create/',
