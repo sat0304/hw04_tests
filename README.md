@@ -24,7 +24,7 @@ git clone https://github.com/sat0304/hw04_tests.git
 ```
 cd hw04_tests
 ```
-- Установить и активируйте виртуальное окружение
+- Установить и активировать виртуальное окружение
 ```
 python3 -m venv venv 
 source venv/bin/activate
